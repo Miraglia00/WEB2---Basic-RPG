@@ -1,6 +1,6 @@
 import Render from './Render.js';
 import MonsterEntity from './MonsterEntity.js';
-import Entity from './Entity.js';
+import SkeletonEntity from './SkeletonEntity.js';
 
 const holder = $('#gridHolder');
 const mainLayer = $('#mainLayer');
@@ -11,12 +11,13 @@ const setup = () => {
 
     const renderer = new Render(holder);
 
+    let skeleton = new SkeletonEntity();
     let monster = new MonsterEntity();
-    monster.spawnEntity();
-    console.log(monster.getPosition())
+    let monster1 = new MonsterEntity();
 
-    renderer.renderEntity(monster);
-
+    renderer.initRenderEntity(skeleton);
+    renderer.initRenderEntity(monster);
+    renderer.initRenderEntity(monster1);
 }
 
 const checkScreenSize = () => {
@@ -37,6 +38,10 @@ const showMessageBox = (message, show) => {
     }else{
         box.addClass('hidden');
     }
+}
+
+const showGridInfo = () => {
+
 }
 
 const setupWall = (gridDiv, coordX, coordY, doors) => {
@@ -71,6 +76,17 @@ const generateGrid = () => {
 
 setup();
 
-window.onresize = () => {
+$(window).resize(() => {
     checkScreenSize();
-};
+});
+
+$('.grid-block').click((e)=> {
+    $('.grid-block').map((i,e) => $(e).removeClass('selectedGrid'));
+    const div = e.currentTarget;
+    if(!$(div).hasClass('wall')) {
+        const x = $(div).attr('id').split('-')[0];
+        const y = $(div).attr('id').split('-')[1];
+    
+        $(div).addClass('selectedGrid');
+    }
+});
