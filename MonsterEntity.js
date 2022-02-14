@@ -3,8 +3,8 @@ import Entity from "./Entity.js";
 export default class MonsterEntity extends Entity {
     constructor() {
         super();
-        this.entityDiv = $("<div class='entity monster'></div>");
+        this.health = 7;
+        this.attack = 2;
+        this.entityDiv.addClass('monster'); 
     }
-
-    getEntityDiv = () => this.entityDiv;
 }
