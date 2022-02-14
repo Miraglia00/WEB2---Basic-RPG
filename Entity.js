@@ -4,20 +4,28 @@ export default class Entity {
         this.health = 5;
         this.attack = 1;
         this.isDead = false;
+        this.isSpawned = false;
         this.position = {
-            isSpawned: false,
             x: -1,
             y: -1
         };
+        this.entityID = Math.floor(Math.random()*100);
+        this.entityDiv = $("<div class='entity' id=" + this.entityID + "></div>");
     }
-
     getHealth = () => this.health;
     getAttack = () => this.attack;
     getIsDead = () => this.isDead;
     getPosition = () => this.position;
+    getEntityDiv = () => this.entityDiv;
+    getEntityID = () => this.entityID;
 
-    spawnEntity = () => {
-        this.position.isSpawned = true;
+    setPosition = (position) => {
+        this.position = position;
+        console.log("position updated: " + this.position.x, this.position.y);
+        return;
+    }
+
+    generatePosition = () => {
         let randomX = Math.floor((Math.random() * 11) + 1);
         let randomY = Math.floor((Math.random() * 11) + 1);
 
