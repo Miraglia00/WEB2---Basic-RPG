@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endless Dungeon</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script
+        src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body class="d-flex justify-content-center align-items-center">
+    <div class="container" id="mainLayer">
+        <div class="row h-100 justify-content-center align-items-center">
+            <div id="playerStats" class="col-1 col-xl-2 flex-fill p-0 m-0">
+                <div> 
+                    <h1>Player Statistics</h1>
+                </div>
+                
+            </div>
+    
+            <div id="gridHolder" class="col-10 col-xl-8 flex-fill p-0 m-0"></div>
+
+            <div id="gameStats" class="col-1 col-xl-2 flex-fill p-0 m-0">
+                <div>asd</div>
+            </div>
+        </div>   
+    </div>
+
+
+    <div class="alert alert-danger d-flex align-items-center hidden" role="alert" id="messageBox">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-1"></i>
+        <div id="messageBody">
+        </div>
+      </div>
+    <script type="module" src="core.js"></script>
+</body>
+</html>
