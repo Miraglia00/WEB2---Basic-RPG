@@ -26,8 +26,8 @@ body {
 }
 
 #gridHolder {
-	max-width: 600px;
-	max-height: 600px;
+	max-width: 700px;
+	max-height: 700px;
 	width: 100vw;
 	height: 100vw;
 	position: relative;
@@ -58,6 +58,20 @@ body {
 	background-size: cover;
 }
 
+.skeleton {
+	background-image: url("entities_img/skeleton.png");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.player {
+	background-image: url("entities_img/player.png");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
 .break {
 	flex-basis: 100%;
 	width: 0;
@@ -76,4 +90,8 @@ body {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
+}
+
+.selectedGrid {
+	border: 1px solid red;
 }
