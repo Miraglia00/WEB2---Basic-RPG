@@ -19,31 +19,32 @@
         <h1 id="turnInfo"></h1>
 
         <div class="row justify-content-center align-items-center flex-fill flex-grow-1 h-100">
-            <div id="playerStats" class="col-1 col-xl-2 flex-fill p-0 m-0">
-                <div> 
-                    <h2>Player Statistics</h2>
+            <div id="playerStats" class="col-1 col-xl-2 flex-fill d-flex flex-column justify-content-center align-items-center">
+                <h2 class="text-center mb-5">Player information</h2>
+
+                <div id="playerInfo" class="text-center">
+                            
                 </div>
-                
             </div>
     
             <div id="gridHolder" class="col-10 col-xl-8 flex-fill p-0 m-0"></div>
 
-            <div id="gameStats" class="h-100 col-1 col-xl-2 d-flex flex-fill p-0 m-0 justify-content-evenly align-items-center flex-column">
-                <div class="d-flex flex-column justify-content-center align-items-center" id="gridInformationHolder">
-                    <h2 class="text-center">Grid information:</h2>
-                    <div id="gridInfo" class="d-flex flex-column justify-content-center align-items-center">
-                        <p id="gridPos"></p>
+            <div class="h-100 col-1 col-xl-2 d-flex flex-fill p-0 m-0 justify-content-evenly align-items-center flex-column">
+                <div id="gridInfo" class="col-1 col-xl-2 flex-fill d-flex flex-column justify-content-center align-items-center w-100">
+                    <h2 class="text-center mb-5">Grid information:</h2>
+    
+                    <p id="gridPos" class="d-block"></p>
 
-                        <div id="occupantInfo" class="text-center">
-                            
+                    <div id="occupantInfo" class="text-center"></div>
+
+                    <div id="actionPool" class="d-flex flex-column">
+                        <div>
+                            <button id="moveBtn" type="button" class="btn btn-outline-secondary fs-5 w-100 mb-1">Move (-1 AP)</button>
+                            <button id="attckBtn" type="button" class="btn btn-outline-secondary fs-5 w-100">Attack (-1 AP)</button>
                         </div>
+                        <button id="endTurnBtn" type="button" class="btn btn-outline-secondary w-100 mt-4 fs-4 fw-bold">End Turn</button>
                     </div>
                 </div>
-
-                <div id="actionPool">
-                    a
-                </div>
-                
             </div>
         </div>   
     </div>
