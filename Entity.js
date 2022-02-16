@@ -1,6 +1,7 @@
 export default class Entity {
     
     constructor() {
+        this.baseHealth = 5;
         this.health = 5;
         this.attack = 1;
         this.isDead = false;
@@ -11,22 +12,29 @@ export default class Entity {
         };
         this.entityID = Math.floor(Math.random()*100);
         this.entityDiv = $("<div class='entity' id=" + this.entityID + "></div>");
+        this.entityType = "Entity";
     }
     getHealth = () => this.health;
+    getbaseHealth = () => this.baseHealth;
     getAttack = () => this.attack;
     getIsDead = () => this.isDead;
     getPosition = () => this.position;
     getEntityDiv = () => this.entityDiv;
     getEntityID = () => this.entityID;
+    getEntityType = () => this.entityType;
+
+    setBaseHealth = (health) => {
+        this.baseHealth = health;
+        this.health = this.baseHealth;
+    }
 
     setPosition = (position) => {
         this.position = position;
-        console.log("position updated: " + this.position.x, this.position.y);
         return;
     }
 
     generatePosition = () => {
-        let randomX = Math.floor((Math.random() * 11) + 1);
+        let randomX = Math.floor((Math.random() * (9 - 1) + 1));
         let randomY = Math.floor((Math.random() * 11) + 1);
 
         this.position.x = randomX;
@@ -50,5 +58,9 @@ export default class Entity {
         }else{
             return console.error("Invalid target!");
         }
+    }
+
+    setIsSpawned = (b) => {
+        this.isSpawned = b;
     }
 }
