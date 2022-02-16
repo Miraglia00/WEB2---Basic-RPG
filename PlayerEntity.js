@@ -15,6 +15,10 @@ export default class PlayerEntity extends Entity {
     }
 
     getActionPoints = () => this.actionPoints;
+
+    setUsedActionPoints = (amount) => {
+        this.actionPoints.used += amount;
+    }
     
 
 }
