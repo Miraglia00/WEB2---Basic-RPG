@@ -29,9 +29,11 @@ export default class Render {
     }
 
     renderEntity = (e) => {
-        if(e instanceof Entity) {           
+        if(e instanceof Entity) {         
             $('div.grid-block#' + e.getPosition().x + '-' + e.getPosition().y).append(e.getEntityDiv());
-            this.entities.push(e);
+            if(!this.entities.includes(e)) {
+                this.entities.push(e);
+            }
         }else{
             return console.error("Invalid target!" + e instanceof "Entity");
         }
