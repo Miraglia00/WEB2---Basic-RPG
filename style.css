@@ -1,8 +1,8 @@
 @font-face {
 	font-family: "Dungeon";
-	src: url("/font/DUNGRG__.TTF"); /* IE9 Compat Modes */
-	src: url("/font/DUNGRG__.TTF") format("embedded-opentype"),
-		/* IE6-IE8 */ url("/font/DUNGRG__.TTF") format("truetype"); /* Safari, Android, iOS */
+	src: url("/font/Dungeon.ttf"); /* IE9 Compat Modes */
+	src: url("/font/Dungeon.TTF") format("embedded-opentype"),
+		/* IE6-IE8 */ url("/font/Dungeon.TTF") format("truetype"); /* Safari, Android, iOS */
 }
 
 * {
@@ -16,8 +16,6 @@ body {
 	width: 100vw;
 	height: 100vh;
 	background-color: #212020;
-	overflow-y: hidden !important;
-	overflow-x: hidden !important;
 }
 
 #mainLayer {
@@ -38,6 +36,13 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	flex-basis: 0;
+}
+
+#turnInfo {
+	position: absolute;
+	text-align: center;
+	padding-top: 10px;
+	margin: 0;
 }
 
 .grid-block {
@@ -79,6 +84,10 @@ body {
 
 .hidden {
 	display: none !important;
+}
+
+#gridInformationHolder {
+	display: flex;
 }
 
 #messageBox {
