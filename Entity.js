@@ -39,6 +39,7 @@ export default class Entity {
 
         this.position.x = randomX;
         this.position.y = randomY;
+        return;
     }
 
     setHealth = (num) => {
