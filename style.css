@@ -104,3 +104,11 @@ body {
 .selectedGrid {
 	border: 1px solid red;
 }
+
+.btn.disabled,
+.btn:disabled,
+fieldset:disabled .btn {
+	pointer-events: visible;
+	opacity: 0.65;
+	cursor: not-allowed !important;
+}
