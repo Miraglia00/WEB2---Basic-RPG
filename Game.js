@@ -13,6 +13,7 @@ export default class Game {
             turn: 1,
             isPlayerTurn: false,
             isEnemyTurn: false,
+            selectEnabled: true
         };
         this.randomDoorLocations = {
             in: Math.floor((Math.random() * 11) + 1),
@@ -24,7 +25,6 @@ export default class Game {
         this.gridInfoHolder.addClass('hidden');
 
         this.generateGrid();
-        this.setTurn();
 
         this.numberOfEnemies = Math.floor(Math.random() * 5 + 1);
 
@@ -32,16 +32,46 @@ export default class Game {
 
         this.player = new PlayerEntity(this.randomDoorLocations.in);
         this.render.renderEntity(this.player);
-        console.log(this.player);
+
+        this.setTurn();
+
+        this.gameInfo.isPlayerTurn = true;
 
         //listeners
         $(window).resize(() => {
             this.checkScreenSize();
         });
         $('.grid-block').click((e)=> {
-            this.showGridInfo(e);
+            if(this.gameInfo.selectEnabled === true) {
+                this.showGridInfo(e);
+            }   
         });
         //end of listeners
+    }
+
+    isInrange = (e,x,y) => {
+        let entityPos = e.getPosition();
+        let preDefRange = [
+            { x: entityPos.x-1, y: entityPos.y}, { x: entityPos.x+1, y: entityPos.y}, //x axis
+            { x: entityPos.x, y: entityPos.y-1}, { x: entityPos.x, y: entityPos.y+1}, //y axis
+            //diagonals
+            { x: entityPos.x-1, y: entityPos.y+1}, //a
+            { x: entityPos.x+1, y: entityPos.y-1}, //b
+            { x: entityPos.x-1, y: entityPos.y-1}, //c
+            { x: entityPos.x+1, y: entityPos.y+1}, //d
+            /*
+                -----------
+                | a  -  b |         p - player
+                | -  p  - |         a,b,c,d diagonal positions
+                | c  -  d |
+                -----------
+            */
+        ];
+        
+        if(preDefRange.some(el => (el.x === x && el.y === y))) {
+            return true;
+        }else return false;
+
     }
 
     generateGrid = () => {    
@@ -96,8 +126,11 @@ export default class Game {
         const occupantDiv = $('#occupantInfo');
 
         if(!$(div).hasClass('wall')) {
-            const x = $(div).attr('id').split('-')[0];
-            const y = $(div).attr('id').split('-')[1];
+            const x = parseInt($(div).attr('id').split('-')[0]);
+            const y = parseInt($(div).attr('id').split('-')[1]);
+
+            console.log(this.isInrange(this.player, x,y))
+
     
             $('#gridPos').text("X: " + x + "; Y: " + y);
         
