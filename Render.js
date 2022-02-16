@@ -7,9 +7,10 @@ export default class Render {
     }
 
     getRenderedEntities = () => this.entities;
+
     getEntityByID = (id) => {
-        for(e of this.entities) {
-            if(e.getEntityID() === id) return e;
+        for(let e of this.entities) {
+            if(e.getEntityID() === id) return e
         }
     }
 
