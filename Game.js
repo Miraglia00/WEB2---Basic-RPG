@@ -9,10 +9,17 @@ export default class Game {
         this.mainLayer = $('#mainLayer');
         this.gridInfoHolder = $('#gridInformationHolder');
         this.turnInfo = $('#turnInfo');
+
+        this.attckBtn = $('#attckBtn');
+        this.moveBtn = $('#moveBtn');
+        this.endTurnBtn = $('#endTurnBtn');
+
+        this.toggleButton(this.attckBtn, false);
+        this.toggleButton(this.moveBtn, false);
+
         this.gameInfo = {
             turn: 1,
-            isPlayerTurn: false,
-            isEnemyTurn: false,
+            isPlayerTurn: true,
             selectEnabled: true
         };
         this.randomDoorLocations = {
@@ -35,18 +42,46 @@ export default class Game {
 
         this.setTurn();
 
-        this.gameInfo.isPlayerTurn = true;
+        this.updatePlayerStats();
+
 
         //listeners
         $(window).resize(() => {
             this.checkScreenSize();
         });
+
         $('.grid-block').click((e)=> {
             if(this.gameInfo.selectEnabled === true) {
-                this.showGridInfo(e);
+                this.showGridInfo(e.currentTarget);
             }   
         });
+
+        $(this.moveBtn).click((e) => {
+            const selectedDiv = $('.grid-block.selectedGrid');
+            const x = parseInt(selectedDiv.attr('id').split('-')[0]);
+            const y = parseInt(selectedDiv.attr('id').split('-')[1]);
+
+            if(this.isInrange(this.player, x,y) && 
+                (this.player.getActionPoints().used < this.player.getActionPoints().base)){
+                this.player.setUsedActionPoints(1);
+
+                this.player.setPosition({x,y});
+                this.render.updateEntity(this.player);
+                this.updatePlayerStats();
+                this.showGridInfo(selectedDiv);
+            }
+        });
+
+        $(this.endTurnBtn).click((e) => {
+            this.gameInfo.selectEnabled = false;
+            this.gameInfo.isPlayerTurn = false;
+            this.setTurn();
+        });
         //end of listeners
+    }
+
+    toggleButton = (btn, t) => {
+        (t) ? btn.removeClass('disabled') : btn.addClass('disabled');
     }
 
     isInrange = (e,x,y) => {
@@ -121,15 +156,19 @@ export default class Game {
 
     showGridInfo = (e) => {
         $('.grid-block').map((i,e) => $(e).removeClass('selectedGrid'));
-
-        const div = e.currentTarget;
+        const div = e;
         const occupantDiv = $('#occupantInfo');
 
         if(!$(div).hasClass('wall')) {
             const x = parseInt($(div).attr('id').split('-')[0]);
             const y = parseInt($(div).attr('id').split('-')[1]);
 
-            console.log(this.isInrange(this.player, x,y))
+            if(this.isInrange(this.player, x,y) && (this.player.getActionPoints().used < this.player.getActionPoints().base)) {
+                this.showAvailableActions(e);
+            }else{
+                this.toggleButton(this.moveBtn, false);
+                this.toggleButton(this.attckBtn, false);
+            }
 
     
             $('#gridPos').text("X: " + x + "; Y: " + y);
@@ -139,8 +178,8 @@ export default class Game {
             this.gridInfoHolder.removeClass('hidden');
             occupantDiv.text("");
 
-            if($(e.target).hasClass('entity')) {
-                const entityID = parseInt($(e.target).attr('id'));
+            if($(e).children().hasClass('entity')) {
+                const entityID = parseInt($(e).children().attr('id'));
     
                 const entityData = this.render.getEntityByID(entityID);
     
@@ -159,7 +198,14 @@ export default class Game {
     }
 
     setTurn = () => {
-        this.turnInfo.text("Turn " + this.gameInfo.turn);
+        console.log(this.gameInfo.isPlayerTurn)
+        let turnString = (this.gameInfo.isPlayerTurn === true) ? 
+        "<span class='text-primary'>Player's turn</span>"
+        :
+        "<span class='text-danger'>Enemy's turn</span>";
+
+        this.turnInfo.text("Turn " + this.gameInfo.turn + " | ");
+        this.turnInfo.append(turnString);
     }
 
     spawnEnemy = (type) => {
@@ -175,6 +221,47 @@ export default class Game {
             this.spawnEnemy(type);
             
         }
+    }
+    
+    showAvailableActions = (e) => {
+        if($(e.target).hasClass('entity')) {
+            //enemy
+        }else{
+            this.toggleButton(this.moveBtn, true);
+        }
+    }
+
+    updatePlayerStats = () => {
+        const playerInfoHolder = $('#playerInfo');
+        playerInfoHolder.text("");
+        let health = {
+            val: this.player.getHealth(),
+            max: this.player.getbaseHealth()
+        }
+        let actionPts = {
+            used: this.player.getActionPoints().used,
+            max: this.player.getActionPoints().base
+        }
+
+        let playerStatsString = `
+            <p style="color: ${this.colorBasedOnValue(health.val, health.max)}">
+                Health: ${health.val} / ${health.max}
+            </p>
+            <p>Attack DMG: ${this.player.getAttack()}</p>
+            <p style="color: ${this.colorBasedOnValue(actionPts.max - actionPts.used, actionPts.max)}">
+                Action Points(AP): ${actionPts.max - actionPts.used}
+            </p>
+        `;
+
+        playerInfoHolder.append(playerStatsString);
+    }
+
+    colorBasedOnValue = (value, max) => {
+        if((max / value) <= 0.5) {
+            return "#ede609";
+        }else if((max / value) <= 0.25) {
+            return "#c91208";
+        }else return "#808080";
     }
 
 
