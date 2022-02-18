@@ -160,15 +160,21 @@ export default class Game {
                 if(this.isPlayerInVisionRange(e)) {
                     //player fele lepkedunk
                 }else{
-                    let entityMoved = false;
-                    //while(!entityMoved)  {
-                        let randomPos = this.generateRandomPos(this.defineRange(entityPos.x, entityPos.y,1));
-                        console.log(e.getEntityID(), randomPos);
-                    //}  
+                    let randomPos = this.generateRandomPos(this.defineRange(entityPos.x, entityPos.y,1));
+                    console.log(e.getEntityID(), randomPos);
+
+                    await this.wait(500);
+
+                    this.setSelectGrid(randomPos.x, randomPos.y);
+
+                    await this.wait(200);
+                    this.setGridColor(entityPos.x, entityPos.y, -1);
+                    this.moveEntity(e, randomPos.x, randomPos.y);
+                    this.setSelectGrid(-1,-1);
                 }
 
-                await this.wait(2000);
-                this.setGridColor(entityPos.x, entityPos.y, -1);
+                await this.wait(1000);
+                
             }
         }
     }
@@ -313,11 +319,12 @@ export default class Game {
         this.toggleButton(this.attckBtn, false);
         this.toggleButton(this.moveBtn, false);
         this.toggleButton(this.endTurnBtn, false);
+        this.setSelectGrid(-1,-1);
         this.setTurn();
         this.enemyTurn();
     }
 
-    moveEntity = (e, x,y) => {
+    moveEntity = (e, x, y) => {
         if(this.isInRange(e,x,y)){
           
             e.setPosition({x,y});
