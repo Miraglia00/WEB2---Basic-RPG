@@ -57,9 +57,11 @@ export default class Render {
             if(this.entities.includes(e)) { 
                 if(this.isGridOccupied(e.getPosition().x,  e.getPosition().y, e)) {
                     console.error("updateEntity: Grid is occupied! Moving not updated!");
+                    return false;
                 }else{
                     $('div.entity#' + e.entityID).remove();
                     this.renderEntity(e, {x: e.getPosition().x, y: e.getPosition().y });
+                    return true;
                 }
             }else{
                 return console.error("Entity not rendered yet!");
