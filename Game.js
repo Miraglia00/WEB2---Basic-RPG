@@ -56,57 +56,156 @@ export default class Game {
             }   
         });
 
-        $(this.moveBtn).click((e) => {
-            const selectedDiv = $('.grid-block.selectedGrid');
-            const x = parseInt(selectedDiv.attr('id').split('-')[0]);
-            const y = parseInt(selectedDiv.attr('id').split('-')[1]);
-
-            if(this.isInrange(this.player, x,y) && 
-                (this.player.getActionPoints().used < this.player.getActionPoints().base)){
-                this.player.setUsedActionPoints(1);
-
-                this.player.setPosition({x,y});
-                this.render.updateEntity(this.player);
-                this.updatePlayerStats();
-                this.showGridInfo(selectedDiv);
+        $('#actionPool button').click(e => {
+            switch($(e.target).attr('id')) {
+                case 'moveBtn':
+                    this.moveAction();
+                    break;
+                case 'attckBtn':
+                    
+                    break;
+                case 'endTurnBtn':
+                    this.endTurn();
+                    break;
             }
-        });
 
-        $(this.endTurnBtn).click((e) => {
-            this.gameInfo.selectEnabled = false;
-            this.gameInfo.isPlayerTurn = false;
-            this.setTurn();
-        });
+            if(!this.isEnoughAP(this.player)) {
+               this.endTurn();
+              
+            }
+        })
         //end of listeners
     }
 
-    toggleButton = (btn, t) => {
-        (t) ? btn.removeClass('disabled') : btn.addClass('disabled');
+    moveAction = () => {
+        const selectedDiv = $('.grid-block.selectedGrid');
+        const x = parseInt(selectedDiv.attr('id').split('-')[0]);
+        const y = parseInt(selectedDiv.attr('id').split('-')[1]);
+        if(this.isEnoughAP(this.player)) {
+            this.moveEntity(this.player,x,y);
+            this.updatePlayerStats();
+            this.showGridInfo(selectedDiv);
+        }
     }
 
-    isInrange = (e,x,y) => {
-        let entityPos = e.getPosition();
-        let preDefRange = [
-            { x: entityPos.x-1, y: entityPos.y}, { x: entityPos.x+1, y: entityPos.y}, //x axis
-            { x: entityPos.x, y: entityPos.y-1}, { x: entityPos.x, y: entityPos.y+1}, //y axis
+    toggleButton = (btn, t) => {
+        (t) ? btn.removeClass('disabled').removeAttr('disabled') : btn.addClass('disabled').attr('disabled', '1');
+    }
+
+    defineRange = (x,y,range) => {
+       let rangeArray = [
+            { x: x-range, y: y}, { x: x+range, y: y}, //x axis
+            { x: x, y: y-range}, { x: x, y: y+range}, //y axis
             //diagonals
-            { x: entityPos.x-1, y: entityPos.y+1}, //a
-            { x: entityPos.x+1, y: entityPos.y-1}, //b
-            { x: entityPos.x-1, y: entityPos.y-1}, //c
-            { x: entityPos.x+1, y: entityPos.y+1}, //d
+            { x: x-range, y: y+range}, //a
+            { x: x+range, y: y-range}, //b
+            { x:x-range, y: y-range}, //c
+            { x: x+range, y: y+range}, //d
             /*
                 -----------
-                | a  -  b |         p - player
+                | a  -  b |         p - central
                 | -  p  - |         a,b,c,d diagonal positions
                 | c  -  d |
                 -----------
             */
         ];
-        
+        let returnArray = [];
+        rangeArray.forEach((e,i) => {
+            if(!this.isWall(e.x,e.y)) {
+                returnArray.push(e);
+            }
+        });
+
+        return returnArray;
+    }
+
+    isInRange = (e,x,y, rangeMultiplier=null) => {
+        let entityPos = e.getPosition();
+        let range = 1;
+        if(rangeMultiplier !== null && parseInt(rangeMultiplier)) {
+            range = range * rangeMultiplier;
+        }
+
+        let preDefRange = this.defineRange(entityPos.x, entityPos.y, range);
+
         if(preDefRange.some(el => (el.x === x && el.y === y))) {
             return true;
         }else return false;
+    }
 
+    isPlayerInVisionRange = (e) => {
+        let playerPos = this.player.getPosition();
+
+        if(this.isInRange(e, playerPos.x, playerPos.y) || this.isInRange(e, playerPos.x, playerPos.y, 2)) {
+            return true;
+        }
+        return false;
+    }
+
+    isWall = (x,y) => {
+        let div = $('.grid-block#' + x + '-' + y);
+        return div.hasClass('wall');
+    }
+
+    wait = (ms) => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    enemyTurn = async () => {
+        let entities = this.render.getRenderedEntities();
+        for(let e of entities) {
+            if(!(e instanceof PlayerEntity)) {
+                let entityPos = e.getPosition();
+                this.setGridColor(entityPos.x, entityPos.y, '#6e120d');
+                if(this.isPlayerInVisionRange(e)) {
+                    //player fele lepkedunk
+                }else{
+                    let entityMoved = false;
+                    //while(!entityMoved)  {
+                        let randomPos = this.generateRandomPos(this.defineRange(entityPos.x, entityPos.y,1));
+                        console.log(e.getEntityID(), randomPos);
+                    //}  
+                }
+
+                await this.wait(2000);
+                this.setGridColor(entityPos.x, entityPos.y, -1);
+            }
+        }
+    }
+
+    generateRandomPos = (rangePool) => {
+        let pos = null;
+        while(pos === null) {
+            let randomNum = Math.floor(Math.random() * rangePool.length);
+            if(!this.render.isGridOccupied(rangePool[randomNum].x, rangePool[randomNum].x)){
+                pos = rangePool[randomNum];
+            }
+        }
+
+        return pos;
+    }
+
+    setSelectGrid = (x,y) => {
+        if(x === -1 && y === -1) {
+            $('.grid-block').map((i,e) => $(e).removeClass('selectedGrid'));
+            return;
+        }
+
+        if(!this.isWall(x,y)) {
+            $('.grid-block').map((i,e) => $(e).removeClass('selectedGrid'));
+            let div = $('.grid-block#' + x + '-' + y);
+            div.addClass('selectedGrid');
+        } 
+    }
+
+    setGridColor = (x,y,color) => {
+        let div = $('.grid-block#' + x + '-' + y);
+        if(color === -1) {
+            div.css('background-color', 'transparent');
+            return;
+        }
+
+        div.css('background-color', color);
     }
 
     generateGrid = () => {    
@@ -155,7 +254,6 @@ export default class Game {
     }
 
     showGridInfo = (e) => {
-        $('.grid-block').map((i,e) => $(e).removeClass('selectedGrid'));
         const div = e;
         const occupantDiv = $('#occupantInfo');
 
@@ -163,7 +261,7 @@ export default class Game {
             const x = parseInt($(div).attr('id').split('-')[0]);
             const y = parseInt($(div).attr('id').split('-')[1]);
 
-            if(this.isInrange(this.player, x,y) && (this.player.getActionPoints().used < this.player.getActionPoints().base)) {
+            if(this.isInRange(this.player, x,y) && this.isEnoughAP(this.player)) {
                 this.showAvailableActions(e);
             }else{
                 this.toggleButton(this.moveBtn, false);
@@ -173,7 +271,7 @@ export default class Game {
     
             $('#gridPos').text("X: " + x + "; Y: " + y);
         
-            $(div).addClass('selectedGrid');
+            this.setSelectGrid(x,y);
     
             this.gridInfoHolder.removeClass('hidden');
             occupantDiv.text("");
@@ -193,12 +291,13 @@ export default class Game {
                 occupantDiv.text("");
             }
         }else{
+            this.toggleButton(this.moveBtn, false);
+            this.toggleButton(this.attckBtn, false);
             this.gridInfoHolder.addClass('hidden');
         }
     }
 
     setTurn = () => {
-        console.log(this.gameInfo.isPlayerTurn)
         let turnString = (this.gameInfo.isPlayerTurn === true) ? 
         "<span class='text-primary'>Player's turn</span>"
         :
@@ -206,6 +305,31 @@ export default class Game {
 
         this.turnInfo.text("Turn " + this.gameInfo.turn + " | ");
         this.turnInfo.append(turnString);
+    }
+
+    endTurn = () => {
+        this.gameInfo.selectEnabled = false;
+        this.gameInfo.isPlayerTurn = false;
+        this.toggleButton(this.attckBtn, false);
+        this.toggleButton(this.moveBtn, false);
+        this.toggleButton(this.endTurnBtn, false);
+        this.setTurn();
+        this.enemyTurn();
+    }
+
+    moveEntity = (e, x,y) => {
+        if(this.isInRange(e,x,y)){
+          
+            e.setPosition({x,y});
+            if(!this.render.updateEntity(e)){
+                return false;
+            }
+            e.setUsedActionPoints(1);
+        }
+    }
+    
+    isEnoughAP = (e) => {
+        return e.getActionPoints().used < e.getActionPoints().base;
     }
 
     spawnEnemy = (type) => {
@@ -257,10 +381,10 @@ export default class Game {
     }
 
     colorBasedOnValue = (value, max) => {
-        if((max / value) <= 0.5) {
-            return "#ede609";
-        }else if((max / value) <= 0.25) {
+        if((value / max) <= 0.25) {
             return "#c91208";
+        }else if((value / max) <= 0.5) {
+            return "#ede609";
         }else return "#808080";
     }
 
