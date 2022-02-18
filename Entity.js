@@ -13,6 +13,11 @@ export default class Entity {
         this.entityID = Math.floor(Math.random()*100);
         this.entityDiv = $("<div class='entity' id=" + this.entityID + "></div>");
         this.entityType = "Entity";
+
+        this.actionPoints = {
+            base: 2,
+            used: 0
+        };
     }
     getHealth = () => this.health;
     getbaseHealth = () => this.baseHealth;
@@ -22,6 +27,11 @@ export default class Entity {
     getEntityDiv = () => this.entityDiv;
     getEntityID = () => this.entityID;
     getEntityType = () => this.entityType;
+    getActionPoints = () => this.actionPoints;
+
+    setUsedActionPoints = (amount) => {
+        this.actionPoints.used += amount;
+    }
 
     setBaseHealth = (health) => {
         this.baseHealth = health;
