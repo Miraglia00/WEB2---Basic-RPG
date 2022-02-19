@@ -70,4 +70,13 @@ export default class Render {
             return console.error("Invalid target!" + e instanceof "Entity");
         }
     }
+
+    removeEntity = (e) => {
+        if(e instanceof Entity) {
+            let index = this.entities.indexOf(e);
+            this.entities.splice(index, 1);
+            $('div.entity#' + e.entityID).remove();
+
+        }
+    }
 }
