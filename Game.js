@@ -56,20 +56,20 @@ export default class Game {
             }   
         });
 
-        $('#actionPool button').click(e => {
+        $('#actionPool button').click(async (e) => {
             switch($(e.target).attr('id')) {
                 case 'moveBtn':
                     this.moveAction();
                     break;
                 case 'attckBtn':
-                    
+                    await this.attackAction();
                     break;
                 case 'endTurnBtn':
                     this.endTurn();
                     break;
             }
 
-            if(!this.isEnoughAP(this.player)) {
+            if(!this.player.isEnoughAP()) {
                this.endTurn();
               
             }
@@ -81,8 +81,31 @@ export default class Game {
         const selectedDiv = $('.grid-block.selectedGrid');
         const x = parseInt(selectedDiv.attr('id').split('-')[0]);
         const y = parseInt(selectedDiv.attr('id').split('-')[1]);
-        if(this.isEnoughAP(this.player)) {
+        if(this.player.isEnoughAP()) {
             this.moveEntity(this.player,x,y);
+            this.updatePlayerStats();
+            this.showGridInfo(selectedDiv);
+            if(x === 0 && y === this.randomDoorLocations.out) {
+                console.log('nyert');
+            }
+        }
+    }
+
+    attackAction = async () => {
+        const selectedDiv = $('.grid-block.selectedGrid');
+        const x = parseInt(selectedDiv.attr('id').split('-')[0]);
+        const y = parseInt(selectedDiv.attr('id').split('-')[1]);
+        if(this.player.isEnoughAP() && this.render.isGridOccupied(x,y)) {
+            const entityID = parseInt($(selectedDiv).children().attr('id'));
+            const entity = this.render.getEntityByID(entityID);
+
+            let isDead = this.player.attackEntity(entity);
+            this.player.setUsedActionPoints(1);
+            await this.showAttackDMG(x,y,this.player.getAttack());
+            if(isDead) {
+                this.render.removeEntity(entity);
+            }
+
             this.updatePlayerStats();
             this.showGridInfo(selectedDiv);
         }
@@ -92,7 +115,15 @@ export default class Game {
         (t) ? btn.removeClass('disabled').removeAttr('disabled') : btn.addClass('disabled').attr('disabled', '1');
     }
 
-    defineRange = (x,y,range) => {
+    showAttackDMG = async (x,y,amount) => {
+        let info = `<span class='text-danger text-center'> -${amount}</span>`;
+        const targetDiv = $(`.grid-block#${x}-${y} > div.entity`);
+        targetDiv.append(info);
+        await this.wait(500);
+        $(targetDiv).children().remove();
+    }
+
+    defineRange = (x,y,range, includeDoor=false) => {
        let rangeArray = [
             { x: x-range, y: y}, { x: x+range, y: y}, //x axis
             { x: x, y: y-range}, { x: x, y: y+range}, //y axis
@@ -126,7 +157,7 @@ export default class Game {
             range = range * rangeMultiplier;
         }
 
-        let preDefRange = this.defineRange(entityPos.x, entityPos.y, range);
+        let preDefRange = this.defineRange(entityPos.x, entityPos.y, range, true);
 
         if(preDefRange.some(el => (el.x === x && el.y === y))) {
             return true;
@@ -155,39 +186,56 @@ export default class Game {
         let entities = this.render.getRenderedEntities();
         for(let e of entities) {
             if(!(e instanceof PlayerEntity)) {
-                let entityPos = e.getPosition();
-                this.setGridColor(entityPos.x, entityPos.y, '#6e120d');
-                if(this.isPlayerInVisionRange(e)) {
-                    //player fele lepkedunk
-                }else{
-                    let randomPos = this.generateRandomPos(this.defineRange(entityPos.x, entityPos.y,1));
-                    console.log(e.getEntityID(), randomPos);
+                while(e.isEnoughAP()) {
+                    console.log(e.getEntityID() + " step from ", e.getPosition());
+                    let entityPos = e.getPosition();
+                    this.setGridColor(entityPos.x, entityPos.y, '#6e120d');
 
-                    await this.wait(500);
-
-                    this.setSelectGrid(randomPos.x, randomPos.y);
-
-                    await this.wait(200);
-                    this.setGridColor(entityPos.x, entityPos.y, -1);
-                    this.moveEntity(e, randomPos.x, randomPos.y);
-                    this.setSelectGrid(-1,-1);
+                    if(this.isPlayerInVisionRange(e)) {
+                        console.log('player in range');
+                        await this.wait(200);
+                        this.setGridColor(entityPos.x, entityPos.y, -1); 
+                        e.setUsedActionPoints(1);
+                    }else{
+                        let randomPos = await this.generateRandomPos(this.defineRange(entityPos.x, entityPos.y,1));
+                        console.log(randomPos, "generated...");
+    
+                        await this.wait(500);
+    
+                        this.setSelectGrid(randomPos.x, randomPos.y);
+    
+                        await this.wait(200);
+                        this.setGridColor(entityPos.x, entityPos.y, -1); 
+                        this.moveEntity(e, randomPos.x, randomPos.y);
+                        this.setSelectGrid(-1,-1);
+                   }
+    
+                    await this.wait(1500); 
                 }
+            }
+        }
 
-                await this.wait(1000);
-                
+        this.endTurn();
+    }
+
+    refillEnemyAP = () => {
+        const entities = this.render.getRenderedEntities();
+        for(let e of entities) {
+            if(!(e instanceof PlayerEntity)) {
+                e.refillActionPoints();
             }
         }
     }
-
-    generateRandomPos = (rangePool) => {
+    generateRandomPos = async (rangePool) => {
         let pos = null;
         while(pos === null) {
             let randomNum = Math.floor(Math.random() * rangePool.length);
-            if(!this.render.isGridOccupied(rangePool[randomNum].x, rangePool[randomNum].x)){
+            if(!this.render.isGridOccupied(rangePool[randomNum].x, rangePool[randomNum].y)){
                 pos = rangePool[randomNum];
+            }else{
+                console.error(rangePool[randomNum], " is occupied by entity!");
             }
         }
-
         return pos;
     }
 
@@ -267,7 +315,7 @@ export default class Game {
             const x = parseInt($(div).attr('id').split('-')[0]);
             const y = parseInt($(div).attr('id').split('-')[1]);
 
-            if(this.isInRange(this.player, x,y) && this.isEnoughAP(this.player)) {
+            if(this.isInRange(this.player, x,y) && this.player.isEnoughAP()) {
                 this.showAvailableActions(e);
             }else{
                 this.toggleButton(this.moveBtn, false);
@@ -286,11 +334,15 @@ export default class Game {
                 const entityID = parseInt($(e).children().attr('id'));
     
                 const entityData = this.render.getEntityByID(entityID);
-    
+                let actionPts = {
+                    used: entityData.getActionPoints().used,
+                    max: entityData.getActionPoints().base
+                }
                 let occupantInfoString = `
                     <p>Entity: <b>${entityData.getEntityType()}(${entityData.getEntityID()})</b>.</p>
                     <p>Health: ${entityData.getHealth()} / ${entityData.getbaseHealth()}</p>
                     <p>Attack DMG: ${entityData.getAttack()}</p>
+                    <p>AP: ${actionPts.max - actionPts.used}</p>
                 `;
                 occupantDiv.append(occupantInfoString);
             }else {
@@ -314,14 +366,25 @@ export default class Game {
     }
 
     endTurn = () => {
-        this.gameInfo.selectEnabled = false;
-        this.gameInfo.isPlayerTurn = false;
-        this.toggleButton(this.attckBtn, false);
-        this.toggleButton(this.moveBtn, false);
-        this.toggleButton(this.endTurnBtn, false);
+        
+        this.gameInfo.selectEnabled = !this.gameInfo.selectEnabled;
+        this.gameInfo.isPlayerTurn = !this.gameInfo.isPlayerTurn;
+        console.log("Turn utan selectEnabled:" + this.gameInfo.selectEnabled + ", isPlayerTurn:" + this.gameInfo.isPlayerTurn);
         this.setSelectGrid(-1,-1);
+        this.gameInfo.turn++;
         this.setTurn();
-        this.enemyTurn();
+
+        if(this.gameInfo.isPlayerTurn === false) {
+            this.toggleButton(this.attckBtn, false);
+            this.toggleButton(this.moveBtn, false);
+            this.toggleButton(this.endTurnBtn, false);
+            this.enemyTurn();
+        }else{
+            this.refillEnemyAP();
+            this.player.refillActionPoints();
+            this.toggleButton(this.endTurnBtn, true);
+            this.updatePlayerStats();
+        }
     }
 
     moveEntity = (e, x, y) => {
@@ -333,10 +396,6 @@ export default class Game {
             }
             e.setUsedActionPoints(1);
         }
-    }
-    
-    isEnoughAP = (e) => {
-        return e.getActionPoints().used < e.getActionPoints().base;
     }
 
     spawnEnemy = (type) => {
@@ -355,9 +414,11 @@ export default class Game {
     }
     
     showAvailableActions = (e) => {
-        if($(e.target).hasClass('entity')) {
-            //enemy
+        if($(e).children().hasClass('entity')) {
+            this.toggleButton(this.moveBtn, false);
+            this.toggleButton(this.attckBtn, true);
         }else{
+            this.toggleButton(this.attckBtn, false);
             this.toggleButton(this.moveBtn, true);
         }
     }
