@@ -33,6 +33,15 @@ export default class Entity {
         this.actionPoints.used += amount;
     }
 
+    refillActionPoints = () => {
+        this.actionPoints.base = 2;
+        this.actionPoints.used = 0;
+    }
+
+    isEnoughAP = () => {
+        return this.getActionPoints().used < this.getActionPoints().base;
+    }
+
     setBaseHealth = (health) => {
         this.baseHealth = health;
         this.health = this.baseHealth;
@@ -62,10 +71,13 @@ export default class Entity {
     };
 
     attackEntity = (e) => {
-        if(typeof e === Entity) {
+        if(e instanceof Entity) {
             let attackerDMG = this.attack;
             e.setHealth(e.getHealth() - attackerDMG);
-            return;
+            
+            if(e.getIsDead()) {
+                return true;
+            }else return false;
         }else{
             return console.error("Invalid target!");
         }
