@@ -44,7 +44,6 @@ export default class Game {
 
         this.updatePlayerStats();
 
-
         //listeners
         $(window).resize(() => {
             this.checkScreenSize();
@@ -144,10 +143,25 @@ export default class Game {
         rangeArray.forEach((e,i) => {
             if(!this.isWall(e.x,e.y)) {
                 returnArray.push(e);
+
+                if(this.isDoor(e.x,e.y) && includeDoor === false) {
+                    returnArray = returnArray.slice(0, -1);
+                    
+                }
+                
             }
         });
 
         return returnArray;
+    }
+
+    getClosestCoordToCoord = () => {
+        /* 
+            Loop through every moverange and calculate the length to the player, the smallest value will be the closest gridpoint
+            that will be the destination to the nemy to move;
+            two coords vector = (end.x-start.x;end.y-start.y)
+            v.length = sqrt(v1^2 + v2^2)
+        */
     }
 
     isInRange = (e,x,y, rangeMultiplier=null) => {
@@ -178,6 +192,11 @@ export default class Game {
         return div.hasClass('wall');
     }
 
+    isDoor = (x,y) => {
+        let div = $('.grid-block#' + x + '-' + y);
+        return div.hasClass('door');
+    }
+
     wait = (ms) => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -189,14 +208,16 @@ export default class Game {
                 while(e.isEnoughAP()) {
                     console.log(e.getEntityID() + " step from ", e.getPosition());
                     let entityPos = e.getPosition();
-                    this.setGridColor(entityPos.x, entityPos.y, '#6e120d');
+                    
 
                     if(this.isPlayerInVisionRange(e)) {
+                        this.setGridColor(entityPos.x, entityPos.y, 'red');
                         console.log('player in range');
                         await this.wait(200);
                         this.setGridColor(entityPos.x, entityPos.y, -1); 
                         e.setUsedActionPoints(1);
                     }else{
+                        this.setGridColor(entityPos.x, entityPos.y, 'yellow');
                         let randomPos = await this.generateRandomPos(this.defineRange(entityPos.x, entityPos.y,1));
                         console.log(randomPos, "generated...");
     
@@ -259,7 +280,22 @@ export default class Game {
             return;
         }
 
-        div.css('background-color', color);
+        div.css('background-color', this.getColor(color));
+    }
+
+    getColor = (string) => {
+        switch(string) {
+            case 'red':
+                return '#6e120d';
+            case 'yellow':
+                return '#c2bc02';
+            case 'grey':
+                return '#808080';
+            case 'primary':
+                return '#0d6efd';
+            default:
+                return 'transparent';
+        }
     }
 
     generateGrid = () => {    
@@ -270,6 +306,9 @@ export default class Game {
                 gridBlockDiv = this.setupWall(gridBlockDiv, i, j, this.randomDoorLocations);
                 
                 gridBlockDiv.attr('id', i+"-"+j);
+                if((i === 0 && j === this.randomDoorLocations.out) || (i === 12 && j=== this.randomDoorLocations.in)) {
+                    gridBlockDiv.addClass('door');
+                }
                 this.gridHolder.append(gridBlockDiv);
             }
         }
@@ -450,10 +489,10 @@ export default class Game {
 
     colorBasedOnValue = (value, max) => {
         if((value / max) <= 0.25) {
-            return "#c91208";
+            return this.getColor('red');
         }else if((value / max) <= 0.5) {
-            return "#ede609";
-        }else return "#808080";
+            return this.getColor('yellow');
+        }else return this.getColor('grey');
     }
 
 
