@@ -7,7 +7,7 @@ export default class PlayerEntity extends Entity {
         this.attack = 10;
         this.entityDiv.addClass('player');
         this.entityType = "Player";
-        this.setPosition({x:11,y:entraceDoorCoord});
+        this.setPosition({x:entraceDoorCoord,y:1});
         this.setIsSpawned(true);
     }
     

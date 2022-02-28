@@ -10,7 +10,7 @@ export default class Render {
 
     getEntityByID = (id) => {
         for(let e of this.entities) {
-            if(e.getEntityID() === id) return e
+            if(e?.getEntityID() === id) return e
         }
     }
 
@@ -18,7 +18,7 @@ export default class Render {
     isGridOccupied = (x,y,self) => {
         if(this.entities.length !== 0) {
            for(let entity of this.entities) {
-               if(entity.getPosition().x === x && entity.getPosition().y === y) {
+               if(entity?.getPosition().x === x && entity?.getPosition().y === y) {
                    if(self === entity) {
                        continue;
                    }else return true;
@@ -54,6 +54,10 @@ export default class Render {
 
     updateEntity = (e) => {
         if(e instanceof Entity) {
+            if(e === null) {
+                return false;
+            }
+            
             if(this.entities.includes(e)) { 
                 if(this.isGridOccupied(e.getPosition().x,  e.getPosition().y, e)) {
                     console.error("updateEntity: Grid is occupied! Moving not updated!");
@@ -74,9 +78,15 @@ export default class Render {
     removeEntity = (e) => {
         if(e instanceof Entity) {
             let index = this.entities.indexOf(e);
-            this.entities.splice(index, 1);
+            this.entities[index] = null
             $('div.entity#' + e.entityID).remove();
-
         }
+    }
+
+    removeAllEntity = () => {
+        for(let entity of this.entities) {
+            this.removeEntity(entity);
+        }
+        this.entities = [];
     }
 }

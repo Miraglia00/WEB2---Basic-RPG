@@ -53,8 +53,8 @@ export default class Entity {
     }
 
     generatePosition = () => {
-        let randomX = Math.floor(Math.random() * (9 - 4) + 4);
-        let randomY = Math.floor((Math.random() * 11) + 1);
+        let randomX = Math.floor((Math.random() * 11) + 1);
+        let randomY = Math.floor(Math.random() * (9 - 4) + 4);
 
         this.position.x = randomX;
         this.position.y = randomY;
