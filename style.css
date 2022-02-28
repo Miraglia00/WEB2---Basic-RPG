@@ -1,8 +1,8 @@
 @font-face {
 	font-family: "Dungeon";
-	src: url("/font/Dungeon.ttf"); /* IE9 Compat Modes */
-	src: url("/font/Dungeon.TTF") format("embedded-opentype"),
-		/* IE6-IE8 */ url("/font/Dungeon.TTF") format("truetype"); /* Safari, Android, iOS */
+	src: url("./font/Dungeon.ttf"); /* IE9 Compat Modes */
+	src: url("./font/Dungeon.TTF") format("embedded-opentype"),
+		/* IE6-IE8 */ url("./font/Dungeon.TTF") format("truetype"); /* Safari, Android, iOS */
 }
 
 * {
@@ -11,6 +11,8 @@
 	box-sizing: border-box;
 	font-size: 1.1em;
 	color: #808080;
+	overflow-x: hidden !important;
+	overflow-y: hidden !important;
 }
 body {
 	width: 100vw;
@@ -18,9 +20,42 @@ body {
 	background-color: #212020;
 }
 
-#mainLayer {
-	height: 100%;
+#gameLayer {
+	width: 100vw;
+	height: 100vh;
 	font-family: Dungeon;
+}
+
+#menuLayer {
+	height: 100%;
+}
+
+.btn-image {
+	max-width: 50px;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.custom-menu-btn {
+	width: 500px;
+	margin-bottom: 1.2em;
+}
+
+.custom-menu-btn > button {
+	font-family: Dungeon;
+	border-color: #808080;
+	color: #808080;
+	padding: 1em 1.2em 1em 1.2em;
+}
+
+.custom-menu-btn:hover > button {
+	background-color: #808080;
+	color: #212020;
+}
+
+.custom-menu-btn:hover .btn-image {
+	opacity: 1;
+	pointer-events: auto;
 }
 
 #gridHolder {
@@ -38,11 +73,9 @@ body {
 	flex-basis: 0;
 }
 
-#turnInfo {
-	position: absolute;
-	text-align: center;
-	padding-top: 10px;
-	margin: 0;
+.player-stat-img {
+	max-width: 100px;
+	max-height: 100px;
 }
 
 .grid-block {
@@ -77,6 +110,12 @@ body {
 	background-size: cover;
 }
 
+.playerPopUp {
+	position: absolute;
+	top: 0;
+	background-color: red;
+}
+
 .break {
 	flex-basis: 100%;
 	width: 0;
@@ -101,6 +140,13 @@ body {
 	background-size: cover;
 }
 
+.door {
+	background-image: url("images/door.jpg");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
 .selectedGrid {
 	border: 1px solid red;
 }
@@ -111,4 +157,23 @@ fieldset:disabled .btn {
 	pointer-events: visible;
 	opacity: 0.65;
 	cursor: not-allowed !important;
+}
+
+.modal-content {
+	background-color: #212020;
+	color: #808080;
+}
+
+.btn-close {
+	color: #fff !important;
+}
+
+#playerStatHolder {
+	display: none;
+}
+
+@media only screen and (min-height: 970px) {
+	#playerStatHolder {
+		display: block;
+	}
 }
