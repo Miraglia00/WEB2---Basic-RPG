@@ -11,30 +11,24 @@
         integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="./style.css" />
 
-    <script type="module" src="core.js" defer></script>
+    <script type="module" src="./app.js" defer></script>
+    <script type="text/javascript" src="./formValidator.js" defer></script>
 </head>
-<body class="">
-    <div class="container-fluid d-flex justify-content-center" id="mainLayer">
+<body>
+    <div class="container-fluid d-flex justify-content-evenly hidden p-0 m-0 flex-column align-items-center" id="gameLayer">
 
         <h1 id="turnInfo"></h1>
 
-        <div class="row justify-content-center align-items-center flex-fill flex-grow-1 h-100">
-            <div id="playerStats" class="col-1 col-xl-2 flex-fill d-flex flex-column justify-content-center align-items-center">
-                <h2 class="text-center mb-5">Player information</h2>
-
-                <div id="playerInfo" class="text-center">
-                            
+        <div class="d-flex justify-content-center align-items-start flex-fill mt-2 flex-column">
+            <div class="d-flex justify-content-center">
+                <div id="gridHolder" class="flex-fill p-0 m-0 align-self-start">
                 </div>
-            </div>
-    
-            <div id="gridHolder" class="col-10 col-xl-8 flex-fill p-0 m-0"></div>
 
-            <div class="h-100 col-1 col-xl-2 d-flex flex-fill p-0 m-0 justify-content-evenly align-items-center flex-column">
-                <div id="gridInfo" class="col-1 col-xl-2 flex-fill d-flex flex-column justify-content-center align-items-center w-100">
-                    <h2 class="text-center mb-5">Grid information:</h2>
-    
+                <div id="gridInfo" class="ms-3 h-100 flex-fill d-flex flex-column justify-content-center align-items-center align-self-center">    
                     <p id="gridPos" class="d-block"></p>
 
                     <div id="occupantInfo" class="text-center"></div>
@@ -48,7 +42,80 @@
                     </div>
                 </div>
             </div>
-        </div>   
+            <div id="playerStatHolder" class="d-flex flex-row align-items-center justify-content-center flex-grow-1 w-100">
+                <img src="./entities_img/player.png" style="max-height: 100px;">
+                <div id="playerStat" class="d-flex flex-row w-100 flex-fill flex-grow-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid d-flex align-items-center flex-column" id="menuLayer">
+
+        <h1 class="justify-self-start mt-5">Dungeon Game</h1>
+
+        <div id="buttons" class="d-flex flex-column flex-grow-1 justify-content-center">
+
+            <div class="custom-menu-btn d-flex justify-content-center align-items-center">
+                <img src="images/sword.png" class="btn-image me-2"> 
+                <button class="btn btn-lg w-75 custom-btn" id="startGameBtn">Start Game</button> 
+                <img src="images/shield.png" class="btn-image ms-2"> 
+            </div>
+
+            <div class="custom-menu-btn d-flex justify-content-center align-items-center">
+                <img src="images/sword.png" class="btn-image me-2"> 
+                <button class="btn btn-lg w-75" id="leaderboardBtn">Leaderboard</button> 
+                <img src="images/shield.png" class="btn-image ms-2"> 
+            </div>
+        </div>
+    </div>
+
+    <div onfocus="validateInputField()" class="modal fade" id="endGameModalWIN" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <form action="save.php" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="staticBackdropLabel">The game is over!</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h3 class="text-center text-success">You successfully escaped the dungeon!</h3>
+                        <hr />
+                        <small class="text-light text-center">Leave a short review and be mentioned on the Hall Of Fame!</small>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="name" id="username" placeholder="username" onkeyup="validateInputField()">
+                            <input type="hidden" class="hidden" name="kills" id="kills"">
+                          </div>
+                          <div class="mb-3">
+                            <textarea class="form-control" name="review" id="review" onkeyup="validateInputField()" placeholder="Review..." rows="3"></textarea>
+                          </div>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" id="saveData">Save Data</button>
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="endGameModalLOSE" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="save.php" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title text-danger" id="staticBackdropLabel">The game is over!</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h3 class="text-center text-danger">You died! Better luck next time.</h3>
+                        <img src="./images/reaper.png" style="max-height: 350px;"/>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </form>
+        </div>
     </div>
 
 
