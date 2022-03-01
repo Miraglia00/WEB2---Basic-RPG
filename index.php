@@ -5,8 +5,11 @@
 
     $db = new DB();
     $USER = new UserService(null,null, $db);
-    if(isset($_SESSION['session']) && $_SESSION['session'] != null) {
-        echo $USER->recoverUser($_SESSION['session']); 
+    if(isset($_SESSION['user']) && $_SESSION['user'] != null) {
+        $recover = $USER->recoverUser($_SESSION['user']);
+        
+        var_dump($recover);
+       var_dump($USER->getUser()); 
     }
 ?>
 
@@ -31,6 +34,19 @@
     <script type="text/javascript" src="./formValidator.js" defer></script>
 </head>
 <body>
+    <?php 
+        if(isset($_SESSION['server_validation'])) {
+    ?>
+            <div class="alert alert-danger d-flex align-items-center m-5 mb-0 alert-dismissible fade show" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                <div>
+                   <?php echo $_SESSION['server_validation']; $_SESSION['server_validation'] = null; ?>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+    <?php
+        }
+    ?>
     <div class="container-fluid d-flex justify-content-evenly hidden p-0 m-0 flex-column align-items-center" id="gameLayer">
 
         <h1 id="turnInfo"></h1>
@@ -75,18 +91,40 @@
         ?>
 
         <div id="buttons" class="d-flex flex-column flex-grow-1 justify-content-center">
-
-            <div class="custom-menu-btn d-flex justify-content-center align-items-center">
-                <img src="images/sword.png" class="btn-image me-2"> 
-                <button class="btn btn-lg w-75 custom-btn" id="startGameBtn">Start Game</button> 
-                <img src="images/shield.png" class="btn-image ms-2"> 
-            </div>
+            <?php 
+                if($USER->isLoggedIn()) {
+                    ?>
+                        <div class="custom-menu-btn d-flex justify-content-center align-items-center">
+                            <img src="images/sword.png" class="btn-image me-2"> 
+                            <button class="btn btn-lg w-75 custom-btn" id="startGameBtn">Start Game</button> 
+                            <img src="images/shield.png" class="btn-image ms-2"> 
+                        </div>
+            <?php 
+            }else{
+                    ?>
+                    <div class="custom-menu-btn d-flex justify-content-center align-items-center">
+                        <img src="images/sword.png" class="btn-image me-2"> 
+                        <button class="btn btn-lg w-75 custom-btn" data-bs-toggle='modal' data-bs-target='#userDialog'>Login/Register</button> 
+                        <img src="images/shield.png" class="btn-image ms-2"> 
+                    </div>
+                <?php
+                }
+            ?>
 
             <div class="custom-menu-btn d-flex justify-content-center align-items-center">
                 <img src="images/sword.png" class="btn-image me-2"> 
                 <button class="btn btn-lg w-75" id="leaderboardBtn">Leaderboard</button> 
                 <img src="images/shield.png" class="btn-image ms-2"> 
             </div>
+
+            
+            <?php if($USER->isLoggedIn()) { ?>
+                <div class="custom-menu-btn d-flex justify-content-center align-items-center">
+                    <img src="images/sword.png" class="btn-image me-2"> 
+                    <button class="btn btn-lg w-75 custom-btn" id="logoutBtn">Leave</button> 
+                    <img src="images/shield.png" class="btn-image ms-2"> 
+                </div>
+            <?php } ?>
         </div>
     </div>
 
@@ -138,7 +176,7 @@
             </form>
         </div>
     </div>
-
+    <?php if(!$USER->isLoggedIn()) { ?>
     <div onfocus="checkInputFields(this)" class="modal fade" id="userDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
                 <div class="modal-content">
@@ -177,6 +215,7 @@
                 </div>
         </div>
     </div>
+    <?php } ?>
 
 
     <div class="alert alert-danger d-flex align-items-center hidden" role="alert" id="messageBox">
