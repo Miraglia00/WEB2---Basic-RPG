@@ -58,6 +58,21 @@ body {
 	pointer-events: auto;
 }
 
+.custom-btn {
+	border-color: #808080;
+	color: #808080;
+}
+
+.custom-btn:hover {
+	background-color: #808080;
+	color: #212020;
+}
+
+.custom-btn.active {
+	background-color: #808080;
+	color: #212020;
+}
+
 #gridHolder {
 	max-width: 700px;
 	max-height: 700px;
@@ -170,6 +185,10 @@ fieldset:disabled .btn {
 
 #playerStatHolder {
 	display: none;
+}
+
+.cursor-pointer {
+	cursor: pointer !important;
 }
 
 @media only screen and (min-height: 970px) {
