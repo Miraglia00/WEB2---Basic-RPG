@@ -32,22 +32,35 @@
                 $result = $this->_db->execute_query("SELECT * FROM  web2_users WHERE username='$this->_username'");
 
                 if($result) {
+                    if($result->num_rows == 0) {
+                        $_SESSION['server_validation'] = "User credentials are not matching, try to remember your password or username!";
+                        return false;
+                    }
+
                     $temp = $result->fetch_assoc();
 
                     if(password_verify($this->_password, $temp['password'])) {
-                        $session = $this->generatesessionString();
+                        $datetime = new DateTime();
+                        $datetime->add(new DateInterval('PT5H'));
+                        $session = base64_encode($datetime->format('Y-m-d H:i:s'));
+
                         $this->_db->execute_query("UPDATE web2_users SET session='$session' WHERE username='$this->_username'");
                         $this->_user = array("id" => $temp['id'], "username" => $temp['username'], "session" => $session);
-                        $_SESSION['session'] = $session;
+                        $_SESSION['user'] = $this->_user;
 
                         $this->_password = null;
-
                         return $this->_user;
-                    }else return false;
+                    }else {
+                        $_SESSION['server_validation'] = "User credentials are not matching, try to remember your password or username!";
+                        return false;
+                    }
                     
                 }else throw new Exception('Error when trying to login a user! Error: '.mysqli_error($this->_db));
 
-            }else return false;
+            }else {
+                $_SESSION['server_validation'] = "User credentials are not matching, try to remember your password or username!";
+                return false;
+            }
         }
 
         private function _checkUser() {
@@ -63,34 +76,30 @@
         }
 
         public function isLoggedIn() {
-            if(isset($_SESSION['session']) && $_SESSION['session'] != null) {
+            if(isset($_SESSION['user']) && $_SESSION['user'] != null && $this->_user != null) {
                 return true;
             }else return false;
         }
 
-        private function generatesessionString() {
-            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $randomString = '';
-            
-            for ($i = 0; $i < 10; $i++) {
-                $index = rand(0, strlen($characters) - 1);
-                $randomString .= $characters[$index];
-            }
-            
-            return $randomString;
-        }
-
         public function recoverUser($session) {
             if(isset($session) && $session != null && ($this->_username == null && $this->_password == null)) {
-                $result = $this->_db->execute_query("SELECT * FROM web2_users WHERE session = '$session'");
-                if($result) {
+                $id = $session['id'];
+                $session_string = $session['session'];
+
+                $result = $this->_db->execute_query("SELECT * FROM web2_users WHERE id = '$id' AND session = '$session_string'");
+                if($result && $result->num_rows > 0) {
                     $userData = $result->fetch_assoc();
                     if($userData['session'] != null) {
-                        $this->_username = $userData['username'];
-                        $this->_user = array("id" => $userData['id'], "username" => $userData['username'], "session" => $userData['session']);
-                        $_SESSION['session'] = $session;
+                        $datetime = DateTime::createFromFormat('Y-m-d H:i:s', base64_decode($userData['session']));
+                        $now = new DateTime("now");
 
-                        return $this->_user;
+                        if($datetime > $now) {
+                            $this->_username = $userData['username'];
+                            $this->_user = array("id" => $userData['id'], "username" => $userData['username'], "session" => $userData['session']);
+                            $_SESSION['session'] = $session;
+
+                            return $this->_user;
+                        }else return false;
                     }else return false;
                 }else return false;
             }else throw new Exception("Error while recovering user! Session cannot be empty or null!");
