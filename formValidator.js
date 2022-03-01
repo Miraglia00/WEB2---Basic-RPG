@@ -1,7 +1,7 @@
 const submit = $('#submitBtn');
 
 const validateInputField = (self) => {
-    if($(self).val().length >= 3) {
+    if($(self).val().length >= 4) {
         if($(self).attr('type') === 'password' && $('#registerForm').find(self).length) {
             const other = $(self).attr('id') === 'registerPassword_1' ? '#registerPassword_2' : '#registerPassword_1';
 
@@ -20,12 +20,13 @@ const validateInputField = (self) => {
 
             }
         }else {
+            removeErrorMessage(self);
             markAsValid(self);
             checkFormReady();
         }
     }else{
         removeErrorMessage(self);
-        addErrorMessage(self, "Must be at least 3 character long!");
+        addErrorMessage(self, "Must be at least 4 character long!");
         return false;
     }
 }
