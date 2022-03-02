@@ -8,9 +8,9 @@
             ?>
             <div class="card border-custom bg-transparent mt-4">
                 <div class="card-body fs-5 p-0">
-                    <h5 class="card-header border-custom d-flex justify-content-between "><span><?= $row['username'] ?></span> <span><?= $row['saved_at'] ?></span></h5>
+                    <h5 class="card-header border-custom d-flex justify-content-between"><span><?= $row['username'] ?></span> <span><?= $row['saved_at'] ?></span></h5>
                     <p class="card-text mt-3 p-3"><?= $row['review'] ?? "<span class='text-danger'>No review submitted!</span>" ?></p>
-                    <div class="card-footer bg-transparent border-custom">Kills: <?= $row['kills'] ?></div>
+                    <div class="card-footer bg-transparent border-custom d-flex justify-content-between"><span>Kills: <?= $row['kills'] ?></span> <span>Turns: <?= $row['turns'] ?></span></div>
                 </div>
             </div>
             <?php
