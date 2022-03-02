@@ -151,10 +151,11 @@
                     <div class="modal-body">
                         <h3 class="text-center text-success">You successfully escaped the dungeon!</h3>
                         <hr />
-                        <b class="text-light text-center" id="enemyKilled"></b>
+                        <b class="text-light text-center" id="enemyKilled"></b><br />
                         <small class="text-light text-center">Leave a short review if you want to.</small>
                         <div class="mb-3">
                             <input type="hidden" class="hidden" name="kills" id="kills">
+                            <input type="hidden" class="hidden" name="turns" id="turns">
                           </div>
                           <div class="mb-3">
                             <textarea class="form-control" name="review" id="review" placeholder="Review..." rows="3"></textarea>
