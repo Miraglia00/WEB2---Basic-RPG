@@ -59,6 +59,10 @@ export default class Game {
         //end of listeners
     }
 
+    static isGameReady = () => {
+        return this.checkScreenSize(false,true);
+    }
+
     resetGame = () => {
         let randomDoorLocations = {
             in: Math.floor((Math.random() * 11) + 1),
@@ -456,24 +460,28 @@ export default class Game {
         return gridDiv;
     }
 
-    checkScreenSize = () => {
-        if(this.gameInfo.endOfTheGame === false) {
+    static checkScreenSize = (needErrorMessage=true,force=false) => {
+        if(this?.gameInfo?.endOfTheGame === false || force) {
             if(window.innerHeight < 802 || window.innerWidth < 992) {
-                this.mainLayer.addClass('hidden');
-                this.showMessageBox("This game can not be used smaller than a 802x992 (HxW) screen! :(", true);
+
+                if(needErrorMessage) this.showMessageBox("This game can not be used smaller than a 802x992 (HxW) screen! :(", true);
+                return false;
             }else{
-                this.mainLayer.removeClass('hidden');
                 this.showMessageBox("", false);
+                return true;
             }
         }
     }
 
-    showMessageBox = (message, show) => {
+    static showMessageBox = (message, show) => {
+        const holder = $('#messageHolder');
         const box = $('#messageBox');
         $('#messageBody').text(message);
         if(show === true) {
+            holder.removeClass('hidden');
             box.removeClass('hidden');
         }else{
+            holder.addClass('hidden');
             box.addClass('hidden');
         }
     }
