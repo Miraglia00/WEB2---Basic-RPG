@@ -40,7 +40,7 @@ $('#backToMenuBtn').click(() => {
 });
 
 $(window).resize(() => {
-    Game.isGameReady() ? isPlayButtonAvailable(true) : isPlayButtonAvailable(false);
+    Game.isGameReady() ? disablePlayButton(false) : disablePlayButton(true);
 });
 
 
@@ -63,7 +63,7 @@ window.onload = () => {
         }
     }
 
-    Game.isGameReady() ? isPlayButtonAvailable(true) : isPlayButtonAvailable(false);
+    Game.isGameReady() ? disablePlayButton(false) : disablePlayButton(true);
 };
 
 $('#registerButton').click((e) => {
@@ -96,8 +96,16 @@ const redirectLogout = () => {
     window.location = window.location.href + 'logout.php';
 }
 
-const isPlayButtonAvailable = (t) => {
-    (t) ? $('#startGameBtn').removeAttr('disabled').removeClass('disabled') : $('#startGameBtn').attr('disabled', 'disabled').addClass('disabled');
+const disablePlayButton = (t) => {
+    if(t) {
+        $('#startGameBtn').addClass('btn-danger').addClass('disabled').attr('disabled', 'disabled');
+        $('#startGameBtn > span').addClass('text-decoration-line-through');
+        $('#btn-info').removeClass('hidden');
+    }else{
+        $('#startGameBtn').removeClass('btn-danger').removeClass('disabled').removeAttr('disabled');
+        $('#startGameBtn > span').removeClass('text-decoration-line-through');
+        $('#btn-info').addClass('hidden');
+    }
 }
 
 //startGame();
