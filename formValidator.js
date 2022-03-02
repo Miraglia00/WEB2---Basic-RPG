@@ -11,7 +11,7 @@ const validateInputField = (self) => {
 
                 return false;
             }else{
-                removeErrorMessage(self)
+                removeErrorMessage(self);
                 removeErrorMessage(other);
                 markAsValid(self);
                 markAsValid(other);
