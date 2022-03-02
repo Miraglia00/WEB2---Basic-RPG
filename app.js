@@ -8,7 +8,18 @@ const startGame = () => {
 }
 
 $('#startGameBtn').click(() => {
-    startGame();
+    $.ajax({
+        type: "GET",
+        url: "session_alive.php",
+        async: false,
+        success: function(response) {
+           if(parseInt(response) === 1){
+            startGame();
+           }else{
+            redirectLogout();
+           }
+        }
+    });
 });
 
 $('#logoutBtn').click(() => {
