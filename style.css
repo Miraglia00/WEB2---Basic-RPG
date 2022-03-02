@@ -11,13 +11,16 @@
 	box-sizing: border-box;
 	font-size: 1.1em;
 	color: #808080;
-	overflow-x: hidden !important;
-	overflow-y: hidden !important;
 }
 body {
 	width: 100vw;
 	height: 100vh;
 	background-color: #212020;
+}
+
+.not-scrollable {
+	overflow-x: hidden !important;
+	overflow-y: hidden !important;
 }
 
 #gameLayer {
@@ -46,6 +49,10 @@ body {
 	border-color: #808080;
 	color: #808080;
 	padding: 1em 1.2em 1em 1.2em;
+}
+
+.border-custom {
+	border-color: #808080;
 }
 
 .custom-menu-btn:hover > button {
@@ -86,6 +93,15 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	flex-basis: 0;
+}
+
+.absolute-center {
+	position: absolute !important;
+	top: 15px;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .player-stat-img {
