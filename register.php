@@ -5,7 +5,7 @@
 
     $redirect = str_replace('register.php', '', $_SERVER['REQUEST_URI']);
     if(isset($_POST['regName']) && isset($_POST['regPassword_1']) && isset($_POST['regPassword_2'])) {
-        if($_POST['regName'] >= 3 && $_POST['regPassword_1'] >= 3 && $_POST['regPassword_1'] == $_POST['regPassword_2']) {
+        if(strlen($_POST['regName']) >= 4 && strlen($_POST['regPassword_1']) >= 4 && $_POST['regPassword_1'] == $_POST['regPassword_2']) {
             $user = new UserService($_POST['regName'],$_POST['regPassword_1'], new DB());
             $user->register();
             header('Location: '.$redirect);

@@ -65,7 +65,7 @@
 
         private function _checkUser() {
             if($this->_username == null || $this->_password == null || !isset($this->_username) || !isset($this->_password)) {
-               return throw new Exception('User credentials not set!'); 
+               throw new Exception('User credentials not set!'); 
             }
 
             $result = $this->_db->execute_query("SELECT * FROM web2_users WHERE username = '$this->_username'");
