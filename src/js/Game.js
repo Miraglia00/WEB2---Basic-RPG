@@ -136,7 +136,7 @@ export default class Game {
                     this.endTurn();
                     this.endGame(false);
                 }else{
-                    this.gameInfo.totalKills =+ 1;
+                    this.gameInfo.totalKills++;
                 }
             }
             if(e instanceof PlayerEntity) {
@@ -149,6 +149,7 @@ export default class Game {
     endGame = (win) => {
         localStorage.setItem('status', win);
         localStorage.setItem('kills', this.gameInfo.totalKills);
+        localStorage.setItem('turns', this.gameInfo.turn);
         
         window.location.href = window.location.href;
 
