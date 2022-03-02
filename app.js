@@ -48,12 +48,14 @@ $(window).resize(() => {
 window.onload = () => {   
     let storedWin = localStorage.getItem('status');
     let storedKills = localStorage.getItem('kills');
+    let storedTurns = localStorage.getItem('turns');
 
     if(storedWin !== null) {
         if(storedWin) {
             endGameModalWIN.toggle();
             $('#kills').val(storedKills);
-            $('#enemyKilled').text(`You killed ${storedKills} enemy!`);
+            $('#turns').val(storedTurns);
+            $('#enemyKilled').text(`You killed ${storedKills} enemy, and escaped in ${storedTurns} turns!`);
             window.localStorage.clear();
         }else{
             endGameModalLOSE.toggle();
