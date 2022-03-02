@@ -55,7 +55,7 @@ body {
 	border-color: #808080;
 }
 
-.custom-menu-btn:hover > button {
+.custom-menu-btn:hover > button:enabled {
 	background-color: #808080;
 	color: #212020;
 }
@@ -70,7 +70,7 @@ body {
 	color: #808080;
 }
 
-.custom-btn:hover {
+.custom-btn:hover:enabled {
 	background-color: #808080;
 	color: #212020;
 }
