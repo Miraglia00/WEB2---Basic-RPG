@@ -7,9 +7,6 @@
     $USER = new UserService(null,null, $db);
     if(isset($_SESSION['user']) && $_SESSION['user'] != null) {
         $recover = $USER->recoverUser($_SESSION['user']);
-        
-        var_dump($recover);
-       var_dump($USER->getUser()); 
     }
 ?>
 
@@ -21,10 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Endless Dungeon</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <script
-        src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
-        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
     
@@ -37,7 +31,7 @@
     <?php 
         if(isset($_SESSION['server_validation'])) {
     ?>
-            <div class="alert alert-danger d-flex align-items-center m-5 mb-0 alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger d-flex align-items-center alert-dismissible fade show absolute-center w-50" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
                 <div>
                    <?php echo $_SESSION['server_validation']; $_SESSION['server_validation'] = null; ?>
@@ -47,7 +41,20 @@
     <?php
         }
     ?>
-    <div class="container-fluid d-flex justify-content-evenly hidden p-0 m-0 flex-column align-items-center" id="gameLayer">
+    <?php 
+        if(isset($_SESSION['success_message'])) {
+    ?>
+            <div class="alert alert-success d-flex align-items-center alert-dismissible fade show absolute-center w-50" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+                <div>
+                   <?php echo $_SESSION['success_message']; $_SESSION['success_message'] = null; ?>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+    <?php
+        }
+    ?>
+    <div class="container-fluid d-flex justify-content-evenly hidden p-0 m-0 flex-column align-items-center not-scrollable" id="gameLayer">
 
         <h1 id="turnInfo"></h1>
 
@@ -77,16 +84,16 @@
         </div>
     </div>
 
-    <div class="container-fluid d-flex align-items-center flex-column" id="menuLayer">
+    <div class="container-fluid d-flex align-items-center flex-column scrollable h-100" id="menuLayer">
 
-        <h1 class="justify-self-start mt-5">Dungeon Game</h1>
+        <h1 id="title" class="justify-self-start mt-5 flex-shrink-0">Dungeon Game</h1>
         <?php 
             if($USER->isLoggedIn()) {
-                echo "<small class='text-success'>
+                echo "<small class='text-success flex-shrink-0'>
                     Logged in as: ".$USER->getUser()['username']."
                 </small>";
             }else{
-                echo "<small class='text-danger cursor-pointer' data-bs-toggle='modal' data-bs-target='#userDialog'>Not logged in!</small>";
+                echo "<small class='text-danger cursor-pointer flex-shrink-0' data-bs-toggle='modal' data-bs-target='#userDialog'>Not logged in!</small>";
             }
         ?>
 
@@ -126,9 +133,14 @@
                 </div>
             <?php } ?>
         </div>
+
+        <div id="leaderBoard" class="mt-5 hidden w-50 d-flex justify-content-center flex-column align-items-center">
+            <button class="btn custom-btn align-self-start flex-shrink-0" id="backToMenuBtn">Back to the menu</button>
+            <div id="leaderBoard-data" class="p-0 w-100 pb-3"></div>
+        </div>
     </div>
 
-    <div onload="validateInputField()" class="modal fade" id="endGameModalWIN" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="endGameModalWIN" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-md">
             <form action="save.php" method="post">
                 <div class="modal-content">
@@ -139,13 +151,13 @@
                     <div class="modal-body">
                         <h3 class="text-center text-success">You successfully escaped the dungeon!</h3>
                         <hr />
-                        <small class="text-light text-center">Leave a short review and be mentioned on the Hall Of Fame!</small>
+                        <b class="text-light text-center" id="enemyKilled"></b>
+                        <small class="text-light text-center">Leave a short review if you want to.</small>
                         <div class="mb-3">
-                            <input type="text" class="form-control" name="name" id="username" placeholder="username" onkeyup="validateInputField()">
-                            <input type="hidden" class="hidden" name="kills" id="kills"">
+                            <input type="hidden" class="hidden" name="kills" id="kills">
                           </div>
                           <div class="mb-3">
-                            <textarea class="form-control" name="review" id="review" onkeyup="validateInputField()" placeholder="Review..." rows="3"></textarea>
+                            <textarea class="form-control" name="review" id="review" placeholder="Review..." rows="3"></textarea>
                           </div>
                     </div>
                 <div class="modal-footer">
@@ -217,11 +229,12 @@
     </div>
     <?php } ?>
 
-
-    <div class="alert alert-danger d-flex align-items-center hidden" role="alert" id="messageBox">
+    <div class="d-flex h-100 w-100 hidden align-items-center justify-content-center" id="messageHolder">
+    <div class="alert alert-danger d-flex hidden" role="alert" id="messageBox">
         <i class="bi bi-exclamation-triangle-fill me-2 fs-1"></i>
         <div id="messageBody">
         </div>
-      </div>
+    </div>
+    </div?
 </body>
 </html>
