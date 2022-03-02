@@ -1,8 +1,8 @@
 @font-face {
 	font-family: "Dungeon";
 	src: url("./font/Dungeon.ttf"); /* IE9 Compat Modes */
-	src: url("./font/Dungeon.TTF") format("embedded-opentype"),
-		/* IE6-IE8 */ url("./font/Dungeon.TTF") format("truetype"); /* Safari, Android, iOS */
+	src: url("./font/Dungeon.ttf") format("embedded-opentype"),
+		/* IE6-IE8 */ url("./font/Dungeon.ttf") format("truetype"); /* Safari, Android, iOS */
 }
 
 * {
@@ -72,6 +72,9 @@ body {
 
 .custom-btn:hover:enabled {
 	background-color: #808080;
+}
+
+.custom-btn:hover:enabled > span {
 	color: #212020;
 }
 
