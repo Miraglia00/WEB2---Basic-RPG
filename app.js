@@ -5,7 +5,6 @@ const endGameModalLOSE =  new bootstrap.Modal(document.getElementById('endGameMo
 
 const startGame = () => {
     const gameInstance = new Game();
-    gameInstance.endGame(false);
 }
 
 $('#startGameBtn').click(() => {
