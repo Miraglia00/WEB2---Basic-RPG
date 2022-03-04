@@ -5,6 +5,7 @@ const endGameModalLOSE =  new bootstrap.Modal(document.getElementById('endGameMo
 
 const startGame = () => {
     const gameInstance = new Game();
+    gameInstance.endGame(false);
 }
 
 $('#startGameBtn').click(() => {
@@ -60,8 +61,9 @@ window.onload = () => {
     let storedWin = localStorage.getItem('status');
     let storedKills = localStorage.getItem('kills');
     let storedTurns = localStorage.getItem('turns');
-
+    
     if(storedWin !== null) {
+        storedWin = (storedWin === "true") ? true : false;
         if(storedWin) {
             endGameModalWIN.toggle();
             $('#kills').val(storedKills);
